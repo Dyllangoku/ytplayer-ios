@@ -17,7 +17,8 @@ env:
 
 jobs:
   build:
-    runs-on: macos-15
+    runs-on: macos-15-intel   # Apple 칩(arm64) 맥은 대기열이 포화돼 빌드가 취소된 적 있음
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
 
