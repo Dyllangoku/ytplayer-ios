@@ -1,0 +1,5 @@
+ios-app/YTPlayer.xcodeproj/
+ios-app/build/
+ios-app/Payload/
+*.ipa
+.DS_Store

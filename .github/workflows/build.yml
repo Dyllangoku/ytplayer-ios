@@ -1,0 +1,69 @@
+name: Build IPA
+
+# 앱 코드가 바뀔 때만 빌드. 차단 스크립트(scripts/)만 바꾸면 빌드 없이 앱이 와이파이로 받아 감.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "ios-app/**"
+      - ".github/workflows/build.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  HOMEBREW_NO_AUTO_UPDATE: 1
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Bundle latest blocking script
+        run: cp scripts/youtube.js ios-app/YTPlayer/Resources/youtube.js
+
+      - name: Generate Xcode project
+        working-directory: ios-app
+        run: xcodegen generate
+
+      - name: Build (unsigned — AltStore signs it with your Apple ID)
+        working-directory: ios-app
+        run: |
+          xcodebuild -version
+          xcodebuild -project YTPlayer.xcodeproj -scheme YTPlayer -configuration Release \
+            -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            SCRIPT_REPO="${{ github.repository }}" \
+            CURRENT_PROJECT_VERSION="${{ github.run_number }}" \
+            build 2>&1 | tee build.log | grep -E "error:|warning: |BUILD" || true
+          # 폴더만 생기고 컴파일은 실패하는 경우를 걸러낸다
+          grep -q '\*\* BUILD SUCCEEDED \*\*' build.log
+          test -x build/Build/Products/Release-iphoneos/YTPlayer.app/YTPlayer
+
+      - name: Package IPA
+        working-directory: ios-app
+        run: |
+          mkdir -p Payload
+          cp -R build/Build/Products/Release-iphoneos/YTPlayer.app Payload/
+          zip -qry YTPlayer.ipa Payload
+
+      - name: Upload build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: ios-app/build.log
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="build-${{ github.run_number }}-${{ github.run_attempt }}"
+          gh release create "$TAG" ios-app/YTPlayer.ipa \
+            --title "YT 플레이어 (빌드 ${{ github.run_number }})" \
+            --notes "자동 빌드. AltStore로 설치하세요." --latest

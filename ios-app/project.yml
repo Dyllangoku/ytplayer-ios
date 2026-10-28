@@ -1,0 +1,44 @@
+name: YTPlayer
+options:
+  bundleIdPrefix: com.ytplayer
+  deploymentTarget:
+    iOS: "15.0"
+settings:
+  base:
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+    SCRIPT_REPO: ""
+targets:
+  YTPlayer:
+    type: application
+    platform: iOS
+    scheme: {}
+    sources:
+      - path: YTPlayer
+        excludes:
+          - "Resources/**"
+      - path: YTPlayer/Resources
+        buildPhase: resources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.ytplayer.app
+        TARGETED_DEVICE_FAMILY: "1"
+        SWIFT_VERSION: "5.0"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        CODE_SIGNING_ALLOWED: "NO"
+    info:
+      path: YTPlayer/Info.plist
+      properties:
+        CFBundleDisplayName: YT 플레이어
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        UILaunchScreen: {}
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+        UIBackgroundModes:
+          - audio
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        ScriptRepo: $(SCRIPT_REPO)
