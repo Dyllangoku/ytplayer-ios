@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YT 광고 차단기 (아이폰)
 // @namespace    yt-adblock
-// @version      1.0.1
+// @version      1.0.2
 // @description  유튜브·유튜브 뮤직: 광고 건너뛰기 + 광고 칸 숨김 + 화면을 꺼도/다른 앱을 써도 계속 재생
 // @match        *://m.youtube.com/*
 // @match        *://www.youtube.com/*
@@ -9,6 +9,8 @@
 // @run-at       document-start
 // @inject-into  page
 // @grant        none
+// @updateURL    https://raw.githubusercontent.com/Dyllangoku/ytplayer-ios/main/scripts/yt-adblock.user.js
+// @downloadURL  https://raw.githubusercontent.com/Dyllangoku/ytplayer-ios/main/scripts/yt-adblock.user.js
 // ==/UserScript==
 
 (() => {
